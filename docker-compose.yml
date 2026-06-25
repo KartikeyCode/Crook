@@ -1,0 +1,62 @@
+version: "3.9"
+
+x-common-env: &common-env
+  CROO_API_URL: ${CROO_API_URL}
+  CROO_WS_URL: ${CROO_WS_URL}
+  ETHERSCAN_API_KEY: ${ETHERSCAN_API_KEY}
+  BASESCAN_API_KEY: ${BASESCAN_API_KEY}
+
+services:
+  whale_tracker:
+    build:
+      context: .
+      dockerfile: agents/whale_tracker/Dockerfile
+    environment:
+      <<: *common-env
+      CROO_SDK_KEY: ${WHALE_TRACKER_SDK_KEY}
+    restart: unless-stopped
+
+  protocol_health:
+    build:
+      context: .
+      dockerfile: agents/protocol_health/Dockerfile
+    environment:
+      <<: *common-env
+      CROO_SDK_KEY: ${PROTOCOL_HEALTH_SDK_KEY}
+    restart: unless-stopped
+
+  token_dd:
+    build:
+      context: .
+      dockerfile: agents/token_dd/Dockerfile
+    environment:
+      <<: *common-env
+      CROO_SDK_KEY: ${TOKEN_DD_SDK_KEY}
+    restart: unless-stopped
+
+  sentiment_fusion:
+    build:
+      context: .
+      dockerfile: agents/sentiment_fusion/Dockerfile
+    environment:
+      <<: *common-env
+      CROO_SDK_KEY: ${SENTIMENT_FUSION_SDK_KEY}
+    restart: unless-stopped
+
+  alpha_composer:
+    build:
+      context: .
+      dockerfile: agents/alpha_composer/Dockerfile
+    environment:
+      <<: *common-env
+      CROO_SDK_KEY: ${ALPHA_COMPOSER_SDK_KEY}
+      WHALE_TRACKER_AGENT_ID: ${WHALE_TRACKER_AGENT_ID}
+      PROTOCOL_HEALTH_AGENT_ID: ${PROTOCOL_HEALTH_AGENT_ID}
+      TOKEN_DD_AGENT_ID: ${TOKEN_DD_AGENT_ID}
+      SENTIMENT_FUSION_AGENT_ID: ${SENTIMENT_FUSION_AGENT_ID}
+    restart: unless-stopped
+    depends_on:
+      - whale_tracker
+      - protocol_health
+      - token_dd
+      - sentiment_fusion
